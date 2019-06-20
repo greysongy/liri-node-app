@@ -27,6 +27,7 @@ inquirer
                 break;
             case ("spotify-this-song"):
                 console.log("We'll spotify something");
+                spotifySomething(secondPhrase);
                 break;
             case ("movie-this"):
                 console.log("We'll movie something");
@@ -46,15 +47,36 @@ function concertSomething(artist) {
         // console.log("Response");
         // console.log(response.data);
         console.log("Upcoming Events");
-        console.log("///////////////////////");
+        // console.log("///////////////////////");
         console.log("");
-        for(var i = 0; i < response.data.length; i++) {
+        for (var i = 0; i < response.data.length; i++) {
             console.log("Venue Name: " + response.data[i].venue.name);
             console.log("Venue Location: " + response.data[i].venue.city + ", " + response.data[i].venue.country);
             //convert correctly using moment.js
             console.log("Event Date: " + response.data[i].datetime);
-            console.log("///////////////////////");
+            // console.log("///////////////////////");
             console.log("");
         }
     })
+}
+
+function spotifySomething(song) {
+    spotify
+        .search({ type: 'track', query: song })
+        .then(function (response) {
+            console.log("Response");
+            console.log(response.tracks.items[0]);
+            console.log("Artist(s): ");
+            for (var i = 0; i < response.tracks.items[0].artists.length; i++) {
+                console.log(response.tracks.items[0].artists[i].name);
+            }
+            console.log("Track Name: " + response.tracks.items[0].name);
+            if (response.tracks.items[0].preview_url !== null) {
+                console.log("Preview Link: " + response.tracks.items[0].preview_url);
+            }
+            console.log("Album: " + response.tracks.items[0].album.name);
+        })
+        .catch(function (err) {
+            console.log(err);
+        });
 }
