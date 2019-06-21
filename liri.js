@@ -16,8 +16,8 @@ function takeInput() {
             }
         ])
         .then(function (response) {
-            console.log("User response");
-            console.log(response.userResponse);
+            // console.log("User response");
+            // console.log(response.userResponse);
             var split = response.userResponse.split(" ");
             var command = split[0];
             split.splice(0, 1);
@@ -79,8 +79,8 @@ function spotifySomething(song) {
     spotify
         .search({ type: 'track', query: song })
         .then(function (response) {
-            console.log("Response");
-            console.log(response.tracks.items[0]);
+            // console.log("Response");
+            // console.log(response.tracks.items[0]);
             console.log("Artist(s): ");
             for (var i = 0; i < response.tracks.items[0].artists.length; i++) {
                 console.log(response.tracks.items[0].artists[i].name);
