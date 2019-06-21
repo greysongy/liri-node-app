@@ -4,44 +4,59 @@ var Spotify = require("node-spotify-api");
 var spotify = new Spotify(keys.spotify);
 var inquirer = require("inquirer");
 var axios = require("axios");
+var fs = require("fs");
 
-inquirer
-    .prompt([
-        {
-            type: "command",
-            message: "Give Liri one of the following 4 comands, followed by a song, concert, or movie if necessary: \n concert-this \n spotify-this-song \n movie-this \n",
-            name: "userResponse"
-        }
-    ])
-    .then(function (response) {
-        console.log("User response");
-        console.log(response.userResponse);
-        var split = response.userResponse.split(" ");
-        var command = split[0];
-        split.splice(0, 1);
-        var secondPhrase = split.join(" ");
-        switch (command) {
-            case ("concert-this"):
-                console.log("We'll concert something");
-                concertSomething(secondPhrase);
-                break;
-            case ("spotify-this-song"):
-                console.log("We'll spotify something");
-                spotifySomething(secondPhrase);
-                break;
-            case ("movie-this"):
-                console.log("We'll movie something");
-                break;
-            case ("do-what-it-says"):
-                console.log("We'll do what it says");
-                break;
-            default:
-                console.log("I'm sorry, but that's not a proper command. Please ask Liribot something else.");
-                break;
+function takeInput() {
+    inquirer
+        .prompt([
+            {
+                type: "command",
+                message: "Give Liri one of the following 4 comands, followed by a song, concert, or movie if necessary: \n concert-this \n spotify-this-song \n movie-this \n do what it says \n q to quit the application \n",
+                name: "userResponse"
+            }
+        ])
+        .then(function (response) {
+            console.log("User response");
+            console.log(response.userResponse);
+            var split = response.userResponse.split(" ");
+            var command = split[0];
+            split.splice(0, 1);
+            var secondPhrase = split.join(" ");
+            if (command === 'q') {
+                return;
+            }
+            switch (command) {
+                case ("concert-this"):
+                    // console.log("We'll concert something");
+                    concertSomething(secondPhrase);
+                    break;
+                case ("spotify-this-song"):
+                    // console.log("We'll spotify something");
+                    spotifySomething(secondPhrase);
+                    break;
+                case ("movie-this"):
+                    // console.log("We'll movie something");
+                    movieSomething(secondPhrase);
+                    break;
+                case ("do-what-it-says"):
+                    // console.log("We'll do what it says");
+                    fs.readFile("random.txt", "utf8", function (error, data) {
+                        if (error) {
+                            return console.log(error);
+                        }
+                        console.log("Data");
+                        console.log(data);
+                        spotifySomething(data);
+                    });
+                    break;
+                default:
+                    console.log("I'm sorry, but that's not a proper command. Please ask Liribot something else.");
+                    break;
+            }
+            takeInput();
 
-        }
-    })
-
+        })
+}
 function concertSomething(artist) {
     axios.get("https://rest.bandsintown.com/artists/" + artist + "/events?app_id=codingbootcamp").then(function (response) {
         // console.log("Response");
@@ -80,3 +95,24 @@ function spotifySomething(song) {
             console.log(err);
         });
 }
+
+function movieSomething(movie) {
+    console.log("Movie");
+    console.log(movie);
+    axios.get("http://www.omdbapi.com/?apikey=trilogy&t=" + movie).then(function (response) {
+        // console.log("Response");
+        // console.log(response.data);
+        console.log("Response Data");
+        console.log(response.data);
+        console.log("Title: " + response.data.Title);
+        console.log("Date of Release: " + response.data.Year);
+        console.log("IMDB Rating: " + response.data.imdbRating);
+        console.log("Rotten Tomatoes Rating: " + response.data.Ratings[1].Value);
+        console.log("Country/countries where film was produced: " + response.data.Country);
+        console.log("Language(s): " + response.data.Language);
+        console.log("Plot: " + response.data.Plot);
+        console.log("Actors: " + response.data.Actors);
+    })
+}
+
+takeInput();
